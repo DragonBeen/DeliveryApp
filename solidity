@@ -1,0 +1,71 @@
+pragma solidity >=0.4.22 <0.7.0;
+
+contract Ordering {
+
+    struct Order{
+        uint256 price;
+        uint256 distance;
+        string food;
+        
+        address owner;
+        address deliveryman;
+        address consumer;
+        bool OK_owner;
+        bool OK_deliveryman;
+    }
+
+    Order[] orders;
+    address[] owners;
+    address[] deliverymans;
+    
+    uint256 NumofOrder;
+    uint256 NumofOwner;
+    uint256 NumofDeliveryman;
+    
+    function enroll_owner () public{
+        owners.push(msg.sender);
+        NumofOwner++;
+    }
+
+    function enroll_deliveryman () public{
+        deliverymans.push(msg.sender);
+        NumofDeliveryman++;
+    }
+    
+    function make_order(string memory IN_food, uint256 IN_price, uint256 IN_distance) public {
+        
+        
+        Order memory order = Order(IN_price, IN_distance, IN_food, msg.sender, address(0), address(0), false, false);
+        order.consumer = msg.sender;
+        orders.push(order);
+    }
+    
+    function OK_order_owner(uint index) public {
+        for (uint i = 0; i < NumofOwner; i++){
+            if(msg.sender == owners[i]){
+                orders[index].OK_owner = true;
+            }
+        }
+    }
+    
+    function OK_order_deliveryman(uint index) public {
+        for (uint i = 0; i < NumofDeliveryman; i++){
+            if(msg.sender == deliverymans[i]){
+                orders[index].OK_deliveryman = true;
+            }
+        }
+    }
+    function get_order(uint index) public view returns (uint256, uint256, string memory){
+        return (orders[index].price, orders[index].distance, orders[index].food);
+    }
+    
+    function complete_order(uint index) public view returns (bool){
+        if(orders[index].OK_owner == true && orders[index].OK_deliveryman == true){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+ 
+}
